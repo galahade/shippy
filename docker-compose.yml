@@ -1,0 +1,78 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # Services
+  consignment:
+    image: shippy-service-consignment
+    depends_on:
+      - datastore
+      - vessel
+    ports:
+      - 50051:50051
+    depends_on:
+      - vessel
+      - datastore
+    networks:
+      - backend
+    environment:
+      MICRO_SERVER_ADDRESS: ":50051"
+      DB_HOST: "mongodb://datastore:27017"
+
+  vessel:
+    image: shippy-service-vessel
+    ports:
+      - 50052:50051
+    depends_on: 
+        - datastore
+    networks:
+      - backend
+    environment:
+      MICRO_SERVER_ADDRESS: ":50051"
+      DB_HOST: "mongodb://datastore:27017"
+user:
+    build: ./shippy-service-user
+    ports:
+      - 50053:50051
+    networks:
+      - backend
+    environment:
+      MICRO_ADDRESS: ":50051"
+  # Commands
+
+#  cli:
+ #   image: shippy-cli-consignment
+ #   networks:
+ #     - backend
+ #   depends_on: 
+ #       - consignment
+
+  # Database tier
+  datastore:
+    image: mongo
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - mongo-data:/data/db # ensures data persistence between restarting
+    ports:
+      - 27017
+    command: mongod --logpath=/dev/null
+    networks:
+      - backend
+
+  database:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_USER: "admin"
+    ports:
+      - 5432:5432
+    networks:
+      - backend
+      
+volumes:
+  mongo-data:
+networks:
+  backend:
+    attachable: true
