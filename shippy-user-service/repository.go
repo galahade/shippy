@@ -4,11 +4,12 @@ package main
 import (
 	"context"
 
-	pb "github.com/galahade/shippy/shippy-service-user/proto/user"
+	pb "github.com/galahade/shippy/shippy-user-service/proto/user"
 	"github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
 )
 
+// User -
 type User struct {
 	ID       string `sql:"id"`
 	Name     string `sql:"name"`
@@ -17,6 +18,7 @@ type User struct {
 	Password string `sql:"password"`
 }
 
+// Repository -
 type Repository interface {
 	GetAll(ctx context.Context) ([]*User, error)
 	Get(ctx context.Context, id string) (*User, error)
@@ -24,14 +26,17 @@ type Repository interface {
 	GetByEmail(ctx context.Context, email string) (*User, error)
 }
 
+// PostgresRepository -
 type PostgresRepository struct {
 	db *sqlx.DB
 }
 
+// NewPostgresRepository -
 func NewPostgresRepository(db *sqlx.DB) *PostgresRepository {
 	return &PostgresRepository{db}
 }
 
+//MarshalUserCollection -
 func MarshalUserCollection(users []*pb.User) []*User {
 	u := make([]*User, len(users))
 	for _, val := range users {
@@ -40,6 +45,7 @@ func MarshalUserCollection(users []*pb.User) []*User {
 	return u
 }
 
+// MarshalUser -
 func MarshalUser(user *pb.User) *User {
 	return &User{
 		ID:       user.Id,
@@ -50,6 +56,7 @@ func MarshalUser(user *pb.User) *User {
 	}
 }
 
+// UnmarshalUserCollection -
 func UnmarshalUserCollection(users []*User) []*pb.User {
 	u := make([]*pb.User, len(users))
 	for _, val := range users {
@@ -58,6 +65,7 @@ func UnmarshalUserCollection(users []*User) []*pb.User {
 	return u
 }
 
+// UnmarshalUser -
 func UnmarshalUser(user *User) *pb.User {
 	return &pb.User{
 		Id:       user.ID,
@@ -68,6 +76,7 @@ func UnmarshalUser(user *User) *pb.User {
 	}
 }
 
+// GetAll -
 func (r *PostgresRepository) GetAll(ctx context.Context) ([]*User, error) {
 	users := make([]*User, 0)
 	if err := r.db.GetContext(ctx, users, "select * from users"); err != nil {
@@ -77,6 +86,7 @@ func (r *PostgresRepository) GetAll(ctx context.Context) ([]*User, error) {
 	return users, nil
 }
 
+// Get -
 func (r *PostgresRepository) Get(ctx context.Context, id string) (*User, error) {
 	var user *User
 	if err := r.db.GetContext(ctx, &user, "select * from users where id = $1", id); err != nil {
@@ -86,6 +96,7 @@ func (r *PostgresRepository) Get(ctx context.Context, id string) (*User, error) 
 	return user, nil
 }
 
+// Create -
 func (r *PostgresRepository) Create(ctx context.Context, user *User) error {
 	user.ID = uuid.NewV4().String()
 	query := "insert into users (id, name, email, company, password) values ($1, $2, $3, $4, $5)"
@@ -93,6 +104,7 @@ func (r *PostgresRepository) Create(ctx context.Context, user *User) error {
 	return err
 }
 
+// GetByEmail -
 func (r *PostgresRepository) GetByEmail(ctx context.Context, email string) (*User, error) {
 	query := "select * from users where email = $1"
 	var user *User

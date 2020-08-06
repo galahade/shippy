@@ -1,25 +1,19 @@
 FROM golang:alpine as builder
 
-RUN apk update && apk upgrade && \
-    apk add --no-cache git
-
-RUN mkdir /app
-WORKDIR /app
-
 ENV GO111MODULE=on
+ENV GOPROXY=https://goproxy.io,direct
+# Use this flow to make download packages as little as possible.
 
-COPY . .
-
+WORKDIR /app
+COPY go.mod go.sum /app/
 RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o shippy-cli-user *.go
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cli *.go
 
 # Run container
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+#RUN apk --no-cache add ca-certificates
+COPY --from=builder /app/cli /cli
 
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /app/shippy-cli-user .
-
-ENTRYPOINT ["./shippy-cli-user"]
+ENTRYPOINT ["/cli"]

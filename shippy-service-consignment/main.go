@@ -35,6 +35,7 @@ func main() {
 	consignmentCollection := client.Database("shippy").Collection("consignments")
 
 	repository := &MongoRepository{consignmentCollection}
+	log.Println("Start to connect to shippy.service.vessel service.")
 	vesselClient := vesselProto.NewVesselService("shippy.service.vessel", service.Client())
 	h := &handler{repository, vesselClient}
 
@@ -43,7 +44,7 @@ func main() {
 		log.Panic(err)
 
 	}
-
+	log.Println("Start to listen as service")
 	// Run the server
 	if err := service.Run(); err != nil {
 		log.Panic(err)

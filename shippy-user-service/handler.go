@@ -5,7 +5,7 @@ import (
 	"context"
 	"errors"
 
-	pb "github.com/EwanValentine/shippy/shippy-service-user/proto/user"
+	pb "github.com/galahade/shippy/shippy-user-service/proto/user"
 	"golang.org/x/crypto/bcrypt"
 )
 

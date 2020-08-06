@@ -30,24 +30,24 @@ services:
     environment:
       MICRO_SERVER_ADDRESS: ":50051"
       DB_HOST: "mongodb://datastore:27017"
-user:
-    build: ./shippy-service-user
-    ports:
-      - 50053:50051
-    networks:
-      - backend
-    environment:
-      MICRO_ADDRESS: ":50051"
-  # Commands
+  # user:
+  #   build: ./shippy-service-user
+  #   ports:
+  #     - 50053:50051
+  #   networks:
+  #     - backend
+  #   environment:
+  #     MICRO_ADDRESS: ":50051"
+    # Commands
 
-#  cli:
- #   image: shippy-cli-consignment
- #   networks:
- #     - backend
- #   depends_on: 
- #       - consignment
+  #  cli:
+  #   image: shippy-cli-consignment
+  #   networks:
+  #     - backend
+  #   depends_on:
+  #       - consignment
 
-  # Database tier
+    # Database tier
   datastore:
     image: mongo
     environment:
@@ -70,7 +70,7 @@ user:
       - 5432:5432
     networks:
       - backend
-      
+
 volumes:
   mongo-data:
 networks:

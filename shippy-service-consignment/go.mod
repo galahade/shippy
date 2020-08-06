@@ -12,6 +12,8 @@ require (
 	github.com/galahade/shippy/shippy-service-vessel v0.0.0-20200729224943-42a3fefae4fb
 	github.com/golang/protobuf v1.4.2
 	github.com/micro/go-micro/v2 v2.9.1
+	github.com/pkg/errors v0.9.1
+	github.com/tidwall/pretty v1.0.1 // indirect
 	go.mongodb.org/mongo-driver v1.4.0
 	golang.org/x/text v0.3.3 // indirect
 )

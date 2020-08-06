@@ -3,10 +3,10 @@ package main
 
 import (
 	"context"
+	"log"
 
 	pb "github.com/galahade/shippy/shippy-service-consignment/proto/consignment"
 	vesselProto "github.com/galahade/shippy/shippy-service-vessel/proto/vessel"
-	"github.com/pkg/errors"
 )
 
 type handler struct {
@@ -18,32 +18,34 @@ type handler struct {
 // which is a create method, which takes a context and a request as an
 // argument, these are handled by the gRPC server.
 func (s *handler) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
-
+	log.Println("Start to create a new consignment.")
 	// Here we call a client instance of our vessel service with our consignment weight,
 	// and the amount of containers as the capacity value
-	vesselResponse, err := s.vesselClient.FindAvailable(ctx, &vesselProto.Specification{
-		MaxWeight: req.Weight,
-		Capacity:  int32(len(req.Containers)),
-	})
-	if vesselResponse == nil {
-		return errors.New("error fetching vessel, returned nil")
-	}
+	/*
+		vesselResponse, err := s.vesselClient.FindAvailable(ctx, &vesselProto.Specification{
+			MaxWeight: req.Weight,
+			Capacity:  int32(len(req.Containers)),
+		})
+		if vesselResponse == nil {
+			return errors.New("error fetching vessel, returned nil")
+		}
 
-	if err != nil {
-		return err
-	}
+		if err != nil {
+			return err
+		}
 
-	// We set the VesselId as the vessel we got back from our
-	// vessel service
-	req.VesselId = vesselResponse.Vessel.Id
-
+		// We set the VesselId as the vessel we got back from our
+		// vessel service
+		req.VesselId = vesselResponse.Vessel.Id
+	*/
 	// Save our consignment
-	if err = s.repository.Create(ctx, MarshalConsignment(req)); err != nil {
+	if err := s.repository.Create(ctx, MarshalConsignment(req)); err != nil {
 		return err
 	}
 
 	res.Created = true
 	res.Consignment = req
+	log.Println("Success creating a consignment.")
 	return nil
 }
 

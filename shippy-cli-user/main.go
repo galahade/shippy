@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	proto "github.com/galahade/shippy/shippy-service-user/proto/user"
+	proto "github.com/galahade/shippy/shippy-user-service/proto/user"
 	"github.com/micro/cli/v2"
 	"github.com/micro/go-micro/v2"
 )
@@ -16,7 +16,6 @@ func createUser(ctx context.Context, service micro.Service, user *proto.User) er
 	if err != nil {
 		return err
 	}
-
 	// print the response
 	fmt.Println("Response: ", rsp.User)
 
@@ -25,7 +24,10 @@ func createUser(ctx context.Context, service micro.Service, user *proto.User) er
 
 func main() {
 	// create and initialise a new service
-	service := micro.NewService()
+	service := micro.NewService(
+		micro.Name("go.micro.srv.user-cli"),
+		micro.Version("latest"),
+	)
 	service.Init(
 		micro.Action(func(c *cli.Context) error {
 			name := c.String("name")
@@ -45,7 +47,6 @@ func main() {
 				log.Println("error creating user: ", err.Error())
 				return err
 			}
-
 			return nil
 		}),
 	)
